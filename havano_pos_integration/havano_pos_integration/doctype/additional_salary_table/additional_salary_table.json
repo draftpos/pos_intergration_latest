@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-17 23:11:48.175704",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "salary_component",
+  "currency",
+  "amount",
+  "custom_amount_currency",
+  "payroll_date",
+  "custom_company_currency",
+  "overwrite_salary_structure_amount",
+  "is_recurring"
+ ],
+ "fields": [
+  {
+   "fieldname": "salary_component",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Salary Component",
+   "options": "Salary Component",
+   "reqd": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "To Currency",
+   "options": "Currency",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Company Currency Amount"
+  },
+  {
+   "fieldname": "custom_company_currency",
+   "fieldtype": "Link",
+   "label": "Company Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "custom_amount_currency",
+   "fieldtype": "Data",
+   "label": "Currency Amount"
+  },
+  {
+   "fieldname": "payroll_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Payroll Date",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "overwrite_salary_structure_amount",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Overwrite Salary Structure Amount"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_recurring",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Recurring"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-05-21 19:55:42.257673",
+ "modified_by": "Administrator",
+ "module": "Havano Pos Integration",
+ "name": "Additional Salary Table",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

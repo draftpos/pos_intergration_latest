@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZIMRA P.A.Y.E. Return Form P2</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page {
+            width: 95%;
+            /* A4 width */
+            min-height: 29.7cm;
+            /* A4 height */
+            padding: 2cm;
+            position: relative;
+            margin: 0px auto;
+        }
+
+        /* ZIMRA Header */
+        .zimra-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .zimra-header>div {
+            padding: 5px;
+        }
+
+        .zimra-text {
+            width: 80%;
+            /* Span both columns */
+            text-align: center;
+        }
+        .zimra-logo{
+            width: 20%;
+            text-align: right;
+        }
+        .zimra-logo > img{
+            height: 70px;
+        }
+
+        .form-details {
+            text-align: center;
+            display: flex;
+            width: 100%;
+            font-size: 18px;
+        }
+        td{
+            border: 1px solid;
+            padding: 10px;
+        }
+        table{
+            margin: 0px auto;
+        }
+
+        /* Employer Information Table */
+        .employer-info-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .employer-info-table td {
+            padding: 5px;
+        }
+
+        .employer-info-table td:first-child {
+            font-weight: bold;
+            width: 30%;
+        }
+
+        /* Declaration */
+        .declaration {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        /* Payment Details Table */
+        .payment-details-table table {
+            width: 100%;
+            /* Adjust width as needed */
+            border-collapse: collapse;
+        }
+
+        .payment-details-table td {
+            padding: 5px;
+        }
+
+        .payment-details-table td:first-child {
+            font-weight: bold;
+            width: 70%;
+        }
+
+        /* Signature Section */
+        .signature-section {
+            display: flex;
+            margin-top: 20px;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .signature-section>div {
+            margin-bottom: 10px;
+        }
+
+        /* Important Notes */
+        .notes {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .text-right{
+            text-align: right;
+        }
+        .stamp{
+            border: 1px solid;
+            padding: 100px;
+        }
+        .grid{
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+        <div class="zimra-header">
+            <div class="zimra-text">
+                <h1>ZIMBABWE REVENUE AUTHORITY</h1>
+                <h3>Return For The Remittance of P.A.Y.E.</h3>
+            </div>
+            <div class="zimra-logo">
+                <img src="/files/zimra.png">
+                <h4>Form P2</h4>
+            </div>
+            
+        </div>
+        <div class="form-details">
+            <p>Region:</p>
+            <p>Station: ZIMBABWE For The Month of: FEBRUARY 2025</p>
+        </div>
+        <h3>Part A</h3>
+
+        <div class="employer-info-table">
+            <table>
+                <tr>
+                    <td>1. Employer's Name</td>
+                    <td>APOINT</td>
+                </tr>
+                <tr>
+                    <td>2. Trade Name</td>
+                    <td>DUAL CURRENCY</td>
+                </tr>
+                <tr>
+                    <td>3. TIN Number:</td>
+                    <td>1234000</td>
+                </tr>
+                <tr>
+                    <td>4. Physical Address</td>
+                    <td>ZIMBABWE</td>
+                </tr>
+                <tr>
+                    <td>5. Postal Address</td>
+                    <td>ZIMBABWE</td>
+                </tr>
+                <tr>
+                    <td>6. Tax Period</td>
+                    <td>FEBRUARY</td>
+                </tr>
+                <tr>
+                    <td>7. Due Date:</td>
+                    <td>10-Mar-25</td>
+                </tr>
+                <tr>
+                    <td>8. E-mail address:</td>
+                    <td>payviewpayroll@gmail.com</td>
+                </tr>
+                <tr>
+                    <td>9. Cell number</td>
+                    <td>0773 100 715</td>
+                </tr>
+            </table>
+        </div>
+
+      
+        <h3>Part B</h3>
+
+        <div class="payment-details-table">
+            <table>
+                <tr>
+                    <td>1. Total Remuneration</td>
+                    <td class="text-right">ZIG$2000.00</td>
+                </tr>
+                <tr>
+                    <td>2. Number of Employees (including contract employees)</td>
+                    <td class="text-right">1</td>
+                </tr>
+                <tr>
+                    <td>3. Gross P.A.Y.E.</td>
+                    <td class="text-right">ZIG$236.70</td>
+                </tr>
+                <tr>
+                    <td>4. AIDS Levy @3%</td>
+                    <td class="text-right">ZIG$7.10</td>
+                </tr>
+                <tr>
+                    <td>5. Total Tax Due</td>
+                    <td class="text-right">ZIG$243.80</td>
+                </tr>
+            </table>
+        </div>
+        <div class="declaration">
+            <p>I declare that the information I have given on this form is correct and complete.</p>
+        </div>
+        <div class="signature-section">
+            <div class="grid">
+                <h3>ADMIN</h3>
+                <h5>Name:</h5>
+                
+            </div>
+            <div class="grid">
+                <h3>ADMINISTRATOR</h3>
+                <h5>Designation:</h5>
+                
+            </div>
+            <div class="grid">
+                <h3>................................................................</h3>
+                <h5>Signature:</h5>
+            </div>
+        </div>
+        <div class="signature-section">
+            <div style="margin-top: 50px;">
+                <h4>Date of submission: .....................................................</h4>
+            </div>
+            <div class="stamp">
+                <p>OFFICIAL DATE STAMP</p>
+            </div>
+        </div>
+
+        <div class="notes">
+            <p>Please note that:</p>
+            <p>1. Interest is charged at 10% per annum for late remittance of PAYE</p>
+            <p>2. Late payments may attract penalties</p>
+        </div>
+    </div>
+
+</body>
+
+</html>

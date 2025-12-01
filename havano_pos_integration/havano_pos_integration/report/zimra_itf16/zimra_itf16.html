@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITF16 Form - ZIMRA</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page {
+            width: 21cm;
+            /* A4 width */
+            min-height: 29.7cm;
+            /* A4 height */
+            padding:0.3cm 1cm;
+            position: relative;
+        }
+
+        /* ZIMRA Branding */
+        .zimra-branding {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .zimra-logo {
+            /* Adjust logo size as needed */
+            width: auto;
+            height: auto;
+            /* margin: 0 auto; Center the logo */
+            display: block;
+        }
+
+        .payview-text {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        /* Company Information Tables */
+        .company-info-table {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .company-info-table table {
+            width: 48%;
+            /* Adjust table width */
+            border-collapse: collapse;
+        }
+
+        .company-info-table td {
+            padding: 2px 5px;
+        }
+
+        .company-info-table td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+
+        /* Form Title */
+        .form-title {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Form Details Table */
+        .form-details-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .form-details-table td {
+            padding: 2px 5px;
+        }
+
+        .form-details-table td:nth-child(even) {
+            text-align: center;
+        }
+
+        /* Employee Information Table */
+        .employee-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .employee-table td {
+            /* border: 1px solid black; */
+            padding: 2px 5px;
+            text-align: right;
+        }
+
+        .employee-table th {
+            font-weight: bold;
+            border-bottom: 1px solid;
+            border-top: 1px solid;
+            padding: 2px 5px;
+            text-align: left;
+        }
+        th{
+            font-weight: bold;
+        }
+        td{
+            font-size: 10px;
+        }
+
+        .employee-table th:nth-child(1),
+        .employee-table td:nth-child(1) {
+            text-align: left;
+        }
+
+        .employee-table .totals-row td {
+            font-weight: bold;
+        }
+
+        /* Page Number */
+        .page-number {
+            position: absolute;
+            bottom: 2cm;
+            right: 2cm;
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+        <div class="zimra-branding">
+            <img src="/files/payview.png" alt="ZIMRA Logo" class="zimra-logo">
+        </div>
+
+        <div class="company-info-table">
+            <table>
+                <tr>
+                    <td>COMPANY NAME:</td>
+                    <td>APOINT</td>
+                </tr>
+                <tr>
+                    <td>ITF16 YEAR:</td>
+                    <td>2025</td>
+                </tr>
+                <tr>
+                    <td>CONTACT ADDRESS:</td>
+                    <td>ZIMBABWE</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td>BP NUMBER:</td>
+                    <td>1234000</td>
+                </tr>
+                <tr>
+                    <td>FDS METHOD:</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>CONTACT PHONE:</td>
+                    <td>0773 100 715</td>
+                </tr>
+            </table>
+            <div style="float: right;">
+                <p>ITF16 FORM</p>
+                <table style="text-align: right; border: 1px solid;">
+                    <tr>
+                        <td><img src="/files/payview.png" alt=""></td>
+                    </tr>
+                </table>
+            </div>
+           
+        </div>
+
+
+        <div class="form-details-table" style="clear: both;">
+            <table>
+                <tr>
+                    <th></th>
+                    <th>NO OF PAY PERIODS: 1</th>
+                    <th>CURRENT PERIOD:</th>
+                    <th>28-Feb-25</th>
+                    <th>PAYROLL CODE: 01</th>
+                    <th>CURRENCY:</th>
+                    <th>Dollars</th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="employee-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>SURNAME</th>
+                        <th>FIRST NAMES</th>
+                        <th>ID NUMBER</th>
+                        <th>DOB</th>
+                        <th>EMP/FROM</th>
+                        <th>EMPL/TO</th>
+                        <th>GROSS PAY</th>
+                        <th>BASIC</th>
+                        <th>BONUS</th>
+                        <th>BENEFITS</th>
+                        <th>PENSION</th>
+                        <th>NSSA</th>
+                        <th>NEC</th>
+                        <th>T/UNION</th>
+                        <th>TAX CREDITS</th>
+                        <th>P.A.Y.E.</th>
+                        <th>AIDS Levy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>EMPLOYEE 1</td>
+                        <td>SURNAME 1</td>
+                        <td>63-111111-P11</td>
+                        <td>19-Jan-82</td>
+                        <td>01-Feb-25</td>
+                        <td>28-Feb-25</td>
+                        <td>275.30</td>
+                        <td>275.30</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>12.39</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>32.58</td>
+                        <td>0.98</td>
+                    </tr>
+                    <tr class="totals-row" style="border-top: 1px solid; border-bottom: 1px solid;">
+                        <td colspan="6" style="text-align: right;">PERIOD TOTALS ARE IN USD</td>
+                        <td></td>
+                        <td>275.30</td>
+                        <td>275.30</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>12.39</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>0.00</td>
+                        <td>32.58</td>
+                        <td>0.98</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="page-number">
+            <p>Page: 1 of 1</p>
+        </div>
+    </div>
+
+</body>
+
+</html>

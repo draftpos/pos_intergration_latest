@@ -1,0 +1,382 @@
+[
+ {
+  "allow_tax_exemption": 0,
+  "amended_from": null,
+  "company": "ChromeGold Pvt Ltd",
+  "currency": "USD",
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Income Tax Slab",
+  "effective_from": "2025-01-01",
+  "modified": "2025-05-23 17:17:51.580762",
+  "name": "Monthly USD",
+  "other_taxes_and_charges": [],
+  "slabs": [
+   {
+    "condition": null,
+    "custom_amount_deduction": 0.0,
+    "from_amount": 0.0,
+    "parent": "Monthly USD",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 0.0,
+    "to_amount": 100.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 20.0,
+    "from_amount": 100.01,
+    "parent": "Monthly USD",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 20.0,
+    "to_amount": 300.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 35.0,
+    "from_amount": 300.01,
+    "parent": "Monthly USD",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 25.0,
+    "to_amount": 1000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 85.0,
+    "from_amount": 1000.01,
+    "parent": "Monthly USD",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 30.0,
+    "to_amount": 2000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 185.0,
+    "from_amount": 2000.01,
+    "parent": "Monthly USD",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 35.0,
+    "to_amount": 3000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 335.0,
+    "from_amount": 3000.01,
+    "parent": "Monthly USD",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 40.0,
+    "to_amount": 1000000.0
+   }
+  ],
+  "standard_tax_exemption_amount": 0.0
+ },
+ {
+  "allow_tax_exemption": 0,
+  "amended_from": null,
+  "company": "Aluminium 24",
+  "currency": "ZWG",
+  "disabled": 0,
+  "docstatus": 1,
+  "doctype": "Income Tax Slab",
+  "effective_from": "2025-02-01",
+  "modified": "2025-03-13 00:00:04.336493",
+  "name": "Monthly ZWG",
+  "other_taxes_and_charges": [],
+  "slabs": [
+   {
+    "condition": null,
+    "custom_amount_deduction": 0.0,
+    "from_amount": 0.0,
+    "parent": "Monthly ZWG",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 0.0,
+    "to_amount": 100.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 20.0,
+    "from_amount": 100.01,
+    "parent": "Monthly ZWG",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 20.0,
+    "to_amount": 300.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 35.0,
+    "from_amount": 300.01,
+    "parent": "Monthly ZWG",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 25.0,
+    "to_amount": 1000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 85.0,
+    "from_amount": 1000.01,
+    "parent": "Monthly ZWG",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 30.0,
+    "to_amount": 2000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 185.0,
+    "from_amount": 2000.01,
+    "parent": "Monthly ZWG",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 35.0,
+    "to_amount": 3000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 335.0,
+    "from_amount": 3000.01,
+    "parent": "Monthly ZWG",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 40.0,
+    "to_amount": 1000000.0
+   }
+  ],
+  "standard_tax_exemption_amount": 0.0
+ },
+ {
+  "allow_tax_exemption": 0,
+  "amended_from": null,
+  "company": "Aluminium 24",
+  "currency": "USD",
+  "disabled": 0,
+  "docstatus": 1,
+  "doctype": "Income Tax Slab",
+  "effective_from": "2025-02-01",
+  "modified": "2025-04-23 23:37:26.246008",
+  "name": "Monthly Aluminium 24",
+  "other_taxes_and_charges": [],
+  "slabs": [
+   {
+    "condition": null,
+    "custom_amount_deduction": 0.0,
+    "from_amount": 0.0,
+    "parent": "Monthly Aluminium 24",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 0.0,
+    "to_amount": 100.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 20.0,
+    "from_amount": 100.01,
+    "parent": "Monthly Aluminium 24",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 20.0,
+    "to_amount": 300.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 35.0,
+    "from_amount": 300.01,
+    "parent": "Monthly Aluminium 24",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 25.0,
+    "to_amount": 1000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 85.0,
+    "from_amount": 1000.01,
+    "parent": "Monthly Aluminium 24",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 30.0,
+    "to_amount": 2000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 185.0,
+    "from_amount": 2000.01,
+    "parent": "Monthly Aluminium 24",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 35.0,
+    "to_amount": 3000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 335.0,
+    "from_amount": 3000.01,
+    "parent": "Monthly Aluminium 24",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 40.0,
+    "to_amount": 1000000.0
+   }
+  ],
+  "standard_tax_exemption_amount": 0.0
+ },
+ {
+  "allow_tax_exemption": 0,
+  "amended_from": null,
+  "company": "HEMPAC",
+  "currency": "ZWL",
+  "disabled": 0,
+  "docstatus": 1,
+  "doctype": "Income Tax Slab",
+  "effective_from": "2025-02-01",
+  "modified": "2025-03-05 14:59:54.766257",
+  "name": "Monthly-ZWL",
+  "other_taxes_and_charges": [],
+  "slabs": [
+   {
+    "condition": null,
+    "custom_amount_deduction": 0.0,
+    "from_amount": 0.0,
+    "parent": "Monthly-ZWL",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 0.0,
+    "to_amount": 100.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 20.0,
+    "from_amount": 100.01,
+    "parent": "Monthly-ZWL",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 20.0,
+    "to_amount": 300.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 35.0,
+    "from_amount": 300.01,
+    "parent": "Monthly-ZWL",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 25.0,
+    "to_amount": 1000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 85.0,
+    "from_amount": 1000.01,
+    "parent": "Monthly-ZWL",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 30.0,
+    "to_amount": 2000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 185.0,
+    "from_amount": 2000.01,
+    "parent": "Monthly-ZWL",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 35.0,
+    "to_amount": 3000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 335.0,
+    "from_amount": 3000.01,
+    "parent": "Monthly-ZWL",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 40.0,
+    "to_amount": 1000000.0
+   }
+  ],
+  "standard_tax_exemption_amount": 0.0
+ },
+ {
+  "allow_tax_exemption": 0,
+  "amended_from": null,
+  "company": "HEMPAC",
+  "currency": "USD",
+  "disabled": 0,
+  "docstatus": 1,
+  "doctype": "Income Tax Slab",
+  "effective_from": "2025-02-01",
+  "modified": "2025-02-25 12:43:05.455207",
+  "name": "Monthly",
+  "other_taxes_and_charges": [],
+  "slabs": [
+   {
+    "condition": null,
+    "custom_amount_deduction": 0.0,
+    "from_amount": 0.0,
+    "parent": "Monthly",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 0.0,
+    "to_amount": 100.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 20.0,
+    "from_amount": 100.01,
+    "parent": "Monthly",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 20.0,
+    "to_amount": 300.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 35.0,
+    "from_amount": 300.01,
+    "parent": "Monthly",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 25.0,
+    "to_amount": 1000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 85.0,
+    "from_amount": 1000.01,
+    "parent": "Monthly",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 30.0,
+    "to_amount": 2000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 185.0,
+    "from_amount": 2000.01,
+    "parent": "Monthly",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 35.0,
+    "to_amount": 3000.0
+   },
+   {
+    "condition": null,
+    "custom_amount_deduction": 335.0,
+    "from_amount": 3000.01,
+    "parent": "Monthly",
+    "parentfield": "slabs",
+    "parenttype": "Income Tax Slab",
+    "percent_deduction": 40.0,
+    "to_amount": 1000000.0
+   }
+  ],
+  "standard_tax_exemption_amount": 0.0
+ }
+]

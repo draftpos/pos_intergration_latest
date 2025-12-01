@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORM P4 - Monthly Payment Schedule</title>
+    <style>
+        /* General Styles */
+        .page {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            line-height: 1.2;
+            width: 100%;
+            margin: 0;
+            padding: 20px 30px;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .logo {
+            flex: 1;
+            /* height: 80px; */
+            text-align: center; 
+        }
+
+        .logo img {
+            height: 150px;
+            width: auto;
+            max-width: 200px;
+            display: inline-block; 
+        }
+
+        .title {
+            flex: 0 0 auto;
+            text-align: left;
+        }
+
+        .title h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: red !important;
+        }
+
+        .title h4 {
+            font-size: 12px;
+            margin-top: 0;
+        }
+
+        .contact-info {
+            flex: 0 0 30%;
+            text-align: left;
+        }
+
+        .contact-info p {
+            margin: 2px 0;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 1px 0px;
+        }
+
+        /* Employer Details Section */
+        .employer-details {
+            width: 100%;
+            margin-bottom: 40px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .employer-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .employer-details td {
+            padding: 0px 5px;
+            border: none;
+        }
+
+        /* Employee Table Section */
+        .employee-table {
+            width: 100%;
+        }
+
+        .employee-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .employee-table th,
+        .employee-table td {
+            padding: 5px;
+            text-align: left;
+        }
+
+        .employee-table thead th {
+            font-weight: normal;
+            height: 50px;
+            vertical-align: bottom;
+            border-bottom: 1px solid black;
+        }
+
+        .employee-table tbody td {
+            vertical-align: top;
+            height: 20px;
+        }
+
+        /* Representative, Notes, Stamp */
+        .representative {
+            margin-top: 10px;
+        }
+
+        .notes {
+            margin-top: 10px;
+            font-size: 9px;
+        }
+
+        .stamp {
+            margin-top: 20px;
+            height: 50px;
+            border: 1px dashed #ccc;
+        }
+
+        /* Footer Section */
+        .footer {
+            width: 100%;
+            text-align: left;
+            margin-top: 20px;
+            font-size: 10px;
+            border-top: 0.5px solid #ccc;
+        }
+        .text-primary{
+            color: blue !important;
+        }
+        .text-danger{
+            color: red !important
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <div class="header">
+        <div class="title">
+            <h3>FORM P4</h3>
+            <h4>Monthly Payment Schedule of Employees</h4>
+        </div>
+        <div class="logo">
+            <img src="/files/nsaa-logo.jpeg" alt="NSSA Logo">
+        </div>
+        <div class="contact-info">
+            <p>National Social Security Authority</p>
+            <p>Selous Avenue/Sam Nujoma</p>
+            <p>P.O. Box CY1387</p>
+            <p>Causeway, Harare</p>
+            <p>Telephone (04) 706523-5</p>
+            <p>Fax (04) 796320</p>
+            <p>Payment Month and Year: <b class="text-primary">28-Feb-25</b></p>
+            <p>Sector: </p>
+            <p>Email Address: <b class="text-primary">payviewpayroll@gmail.com</b></p>
+            <p>Contact Telephone Number: <b class="text-primary">0773 100 715</b></p>
+        </div>
+    </div>
+
+    <div class="employer-details">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Employer SSR No:</td>
+                </tr>
+                <tr>
+                    <td>Employer EC:</td>
+                </tr>
+                <tr>
+                    <td>Employers Name: <b class="text-primary">APOINT</b></td>
+                </tr>
+                <tr>
+                    <td>Employers Physical Address: <b class="text-primary">ZIMBABWE</b></td>
+                </tr>
+                <tr>
+                    <td>Reason for Cessation: - Insert C for Casual Employee, R for Retirement, D for Death, O for any other reason for cessation</td>
+                </tr>
+                <tr>
+                    <td>Nature of Employment: - Insert A if Arduous employment, and N for Normal Employment</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="employee-table">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>SSN</th>
+                    <th>Employee
+                        Staff No</th>
+                    <th>
+                        National ID No
+                    </th>
+                    <th>
+                        Period
+                    </th>
+                    <th>Date of</th>
+                    <th>Surname</th>
+                    <th>First Names</th>
+                     
+                    <th>Commencement Date</th>
+                    <th>Cessation Date</th>
+                    <th>
+                        Reason for
+                        Cessa
+                    </th>
+                    <th>
+                        Nature of
+                        Employment
+                    </th>
+                    <th>NPS Insurable Earnings (ZIG)</th>
+                    <th>Total NPS (9%) Contribution</th>
+                    <th>Basic Salary (WCIF) excluding</th>
+                    <th>Actual Insurable Earnings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>1.</th>
+                    <td class="text-primary">N/A</td>
+                    <td></td>
+                    <td class="text-danger">63-111111-P11 </td>
+                    <td class="text-primary">2502</td>
+                    <td class="text-primary">19-Jan-82</td>
+                    <td class="text-primary">EMPLOYEE1 </td>
+                    <td class="text-primary"> SURNAME1 </td>
+                    <td class="text-primary">22-Feb-20</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-danger">200.00</td>
+                    <td class="text-danger">18.00</td>
+                    <td class="text-danger">200.00</td>
+                    <td class="text-danger">200.00</td>
+                </tr>
+                <tr style="border-top: 1px double; border-bottom: 1px double black; margin-bottom: 40px;">
+                    <td colspan="5" style="text-align: right; font-weight: bold;">
+                        PERIOD TOTALS (USD COMPONENT)
+                    </td>
+                    <td colspan="7"></td>
+                    <td class="text-danger">200.00</td>
+                    <td class="text-danger">18.00</td>
+                    <td class="text-danger">200.00</td>
+                    <td class="text-danger">200.00</td>
+                </tr>
+                <tr style="font-size: 13px; margin-bottom: 20px;">
+                    <td></td>
+                    <td colspan="4">
+                        Employers Representative: 
+                    </td>
+                    <td class="text-primary">ADMIN</td>
+                    <td colspan="3">
+                        Designation: : 
+                    </td>
+                    <td colspan="2" class="text-primary">ADMINISTRATOR</td>
+                    <!-- <td class="text-danger" colspan="4">200.00</td> -->
+                </tr>
+                <tr style="font-size: 12px; margin-bottom: 20px;">
+                    <td></td>
+                    <td><b>Note: </b></td>
+                    <td colspan="10">Use the National I.D. to identify employees pending the issue of
+                        Social Security Numbers.<br> The information given in this form may be used for the purposes of other
+                        Schemes administered by NSSA.</td>
+                    <td colspan="4" rowspan="2" style="border: 1px dotted; text-align: center; padding-top: 200px; padding-bottom: 200px;"> Official Stamp</td>
+                </tr>
+                
+            </tbody>
+        </table>
+    </div>
+
+   
+    <div class="footer">
+        <p>Page: 1 of 1</p>
+        <p>Date: 28/02/2025</p>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2025-03-09 14:43:13.865491",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{}",
+ "letter_head": "NEXAS GAS",
+ "letterhead": null,
+ "modified": "2025-03-09 16:15:06.941347",
+ "modified_by": "Administrator",
+ "module": "Havano Pos Integration",
+ "name": "ZIMDEF Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Salary Slip",
+ "report_name": "ZIMDEF Report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "HR Manager"
+  },
+  {
+   "role": "HR User"
+  },
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "Employee Self Service"
+  }
+ ],
+ "timeout": 0
+}
