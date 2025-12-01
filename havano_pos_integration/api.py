@@ -319,8 +319,7 @@ def get_products():
                 "warehouses": products[item_code]["warehouses"],
                 "default warehouse": get_default_warehouse_for_user(),
                 "prices": products[item_code]["prices"],
-                "taxes": products[item_code]["taxes"],
-                "simple_code" : detail["simple_code"]
+                "taxes": products[item_code]["taxes"]
             }
             final_products.append(final_product)
         
