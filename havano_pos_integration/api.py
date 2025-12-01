@@ -245,7 +245,7 @@ def get_products():
         # Fetch paginated product details
         product_details = frappe.get_all("Item", 
             filters=filters,
-            fields=["name","item_name", "simple_code","item_code", "item_group", "is_stock_item"],
+            fields=["name","item_name","item_code", "item_group", "is_stock_item"],
             start=start,
             limit=limit,
             order_by="item_code"
