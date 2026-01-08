@@ -68,13 +68,9 @@ def get_inventory():
 @frappe.whitelist()
 def get_warehouses():
     try:
-        # Get logged-in user
-        user = frappe.session.user
-
         # Fetch only warehouses created by the logged-in user
         warehouses = frappe.get_all(
             "Warehouse",
-            filters={"owner": user},
             fields=["name", "company", "account", "warehouse_type"]
         )
 
@@ -994,3 +990,4 @@ def create_customer():
         create_response("417", {"error": str(e)})
         frappe.log_error(message=str(e), title="Error creating customer and assigning permission")
         return
+

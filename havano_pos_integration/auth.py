@@ -55,14 +55,11 @@ def login(usr,pwd, timezone):
         },
         pluck="for_value"
     )
-    default_warehouse = frappe.db.get_value("User Permission", 
-        {"user": user.name, "allow": "Warehouse", "is_default": 1}, "for_value")
+    default_warehouse = frappe.db.get_value("User Permission",{"user": user.name, "allow": "Warehouse", "is_default": 1}, "for_value")
     
-    default_cost_center = frappe.db.get_value("User Permission",
-        {"user": user.name, "allow": "Cost Center", "is_default": 1}, "for_value")
+    default_cost_center = frappe.db.get_value("User Permission", {"user": user.name, "allow": "Cost Center", "is_default": 1}, "for_value")
 
-    default_customer = frappe.db.get_value("User Permission",
-        {"user": user.name, "allow": "Customer", "is_default": 1}, "for_value") 
+    default_customer = frappe.db.get_value("User Permission",{"user": user.name, "allow": "Customer", "is_default": 1}, "for_value") 
 
     # Get items and their quantities from default warehouse
     warehouse_items = []
