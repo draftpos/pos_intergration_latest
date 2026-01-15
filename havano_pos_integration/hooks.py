@@ -188,6 +188,13 @@ fixtures = [
     "Custom Field",
     "Letter Head",
     "Print Format",
+    {
+        "dt": "Custom Field",
+        "filters": [
+            ["dt", "=", "Item"],
+            ["fieldname", "=", "simple_code"]
+        ]
+    }
 ]
 
 #doc_events = {
