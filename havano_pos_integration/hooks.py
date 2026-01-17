@@ -192,7 +192,7 @@ fixtures = [
         "dt": "Custom Field",
         "filters": [
             ["dt", "=", "Item"],
-            ["fieldname", "=", "simple_code"]
+            ["fieldname", "=", "custom_simple_code"]
         ]
     }
 ]
