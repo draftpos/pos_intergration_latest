@@ -192,7 +192,7 @@ def get_products():
         product_details = frappe.get_all(
             "Item",
             filters=filters,
-            fields=["name", "item_name", "item_code", "item_group", "is_stock_item", "custom_simple_code"],
+            fields=["name", "item_name", "item_code", "item_group", "is_stock_item", "custom_simple_code","is_sales_item"],
             start=start,
             limit=limit,
             order_by="item_code"
@@ -267,7 +267,8 @@ def get_products():
                 "default warehouse": get_default_warehouse_for_user(),
                 "prices": products[item_code]["prices"],
                 "taxes": products[item_code]["taxes"],
-                "simple_code": p["custom_simple_code"]
+                "simple_code": p["custom_simple_code"],
+                "is_sales_item": p["is_sales_item"]
             })
 
         # Pagination meta
