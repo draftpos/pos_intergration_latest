@@ -192,11 +192,29 @@ def get_products():
         product_details = frappe.get_all(
             "Item",
             filters=filters,
-            fields=["name", "item_name", "item_code", "item_group", "is_stock_item", "custom_simple_code","is_sales_item"],
+            fields=["name", 
+                    "item_name",
+                    "item_code",
+                    "item_group",
+                    "is_stock_item",
+                    "custom_simple_code",
+                    "is_sales_item",
+                    
+                    "stock_uom"],
             start=start,
             limit=limit,
             order_by="item_code"
         )
+        uom_data = frappe.get_all(
+                 "UOM Conversion Detail",
+                 fields=["parent", "uom", "conversion_factor"])
+        uom_map = {}
+
+        for u in uom_data:
+            uom_map.setdefault(u["parent"], []).append({
+                "uom": u["uom"],
+                "conversion_factor": u["conversion_factor"]
+            })
 
         # Warehouses
         bin_data = frappe.get_all("Bin", fields=["item_code", "warehouse", "actual_qty"])
@@ -204,7 +222,7 @@ def get_products():
         # Prices
         price_lists = frappe.get_all(
             "Item Price",
-            fields=["price_list", "price_list_rate", "item_code", "selling", "buying"]
+            fields=["price_list", "price_list_rate", "item_code", "selling","uom", "buying"]
         )
 
         # Prep containers
@@ -235,6 +253,7 @@ def get_products():
                 products[p["item_code"]]["prices"].append({
                     "priceName": p["price_list"],
                     "price": p["price_list_rate"],
+                    "uom": p["uom"] or "nos",
                     "type": "selling" if p["selling"] else "buying"
                 })
 
@@ -268,7 +287,9 @@ def get_products():
                 "prices": products[item_code]["prices"],
                 "taxes": products[item_code]["taxes"],
                 "simple_code": p["custom_simple_code"],
-                "is_sales_item": p["is_sales_item"]
+                "is_sales_item": p["is_sales_item"],
+                "uom": {"stock_uom": p["stock_uom"],
+                "conversions": uom_map.get(item_code, [])},
             })
 
         # Pagination meta
