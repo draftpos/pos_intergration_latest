@@ -166,7 +166,7 @@ def get_pos_profile():
 def get_products():
     try:
         data = frappe.local.form_dict
-        
+
         # Pagination
         page = int(data.get("page", 1))
         limit = int(data.get("limit", 1000))
@@ -174,64 +174,175 @@ def get_products():
             page = 1
         start = (page - 1) * limit
 
-        # Optional item_group filter from request only (NOT permissions)
         item_group = data.get("item_group")
 
-        # Build filters WITHOUT user permissions
         filters = {"disabled": 0}
+
+        user = frappe.session.user
+        user_doc = frappe.get_doc("User", user)
+
+        # --------------------------------------------------------
+        # 🔐 USER PERMISSIONS FOR ITEM GROUPS
+        # --------------------------------------------------------
+        allowed_item_groups = None
+
+        if user_doc.user_rights_profile:
+            profile = frappe.get_doc(
+                "User Rights Profile",
+                user_doc.user_rights_profile
+            )
+
+            if profile.is_item_group_related:
+                # Fetch allowed item groups from User Permission table
+                allowed_item_groups = frappe.get_all(
+                    "User Permission",
+                    filters={
+                        "user": user_doc.name,
+                        "allow": "Item Group"
+                    },
+                    fields=["for_value"]
+                )
+                allowed_item_groups = [g.for_value for g in allowed_item_groups]
+
+                # If enabled but no groups assigned → return empty
+                if not allowed_item_groups:
+                    create_response("200", {
+                        "products": [],
+                        "pagination": {
+                            "current_page": page,
+                            "limit": limit,
+                            "total_count": 0,
+                            "total_pages": 0,
+                            "has_next_page": False,
+                            "has_prev_page": False,
+                            "next_page": None,
+                            "prev_page": None
+                        }
+                    })
+                    return
+
+                filters["item_group"] = ["in", allowed_item_groups]
+
+        # --------------------------------------------------------
+        # Optional API item_group filter (intersect safely)
+        # --------------------------------------------------------
         if item_group:
             if isinstance(item_group, list):
-                filters["item_group"] = ["in", item_group]
+                if allowed_item_groups is not None:
+                    intersection = list(
+                        set(item_group) & set(allowed_item_groups or [])
+                    )
+                    if not intersection:
+                        create_response("200", {
+                            "products": [],
+                            "pagination": {
+                                "current_page": page,
+                                "limit": limit,
+                                "total_count": 0,
+                                "total_pages": 0,
+                                "has_next_page": False,
+                                "has_prev_page": False,
+                                "next_page": None,
+                                "prev_page": None
+                            }
+                        })
+                        return
+                    filters["item_group"] = ["in", intersection]
+                else:
+                    filters["item_group"] = ["in", item_group]
             else:
+                if allowed_item_groups is not None:
+                    if item_group not in allowed_item_groups:
+                        create_response("200", {
+                            "products": [],
+                            "pagination": {
+                                "current_page": page,
+                                "limit": limit,
+                                "total_count": 0,
+                                "total_pages": 0,
+                                "has_next_page": False,
+                                "has_prev_page": False,
+                                "next_page": None,
+                                "prev_page": None
+                            }
+                        })
+                        return
                 filters["item_group"] = item_group
 
+        # --------------------------------------------------------
         # Count
+        # --------------------------------------------------------
         total_count = frappe.db.count("Item", filters=filters)
 
-        # Get products
+        # --------------------------------------------------------
+        # Fetch Items
+        # --------------------------------------------------------
         product_details = frappe.get_all(
             "Item",
             filters=filters,
-            fields=["name", 
-                    "item_name",
-                    "item_code",
-                    "item_group",
-                    "is_stock_item",
-                    "custom_simple_code",
-                    "is_sales_item",
-                    
-                    "stock_uom"],
+            fields=[
+                "name",
+                "item_name",
+                "item_code",
+                "item_group",
+                "is_stock_item",
+                "custom_simple_code",
+                "is_sales_item",
+                "stock_uom"
+            ],
             start=start,
             limit=limit,
             order_by="item_code"
         )
-        uom_data = frappe.get_all(
-                 "UOM Conversion Detail",
-                 fields=["parent", "uom", "conversion_factor"])
-        uom_map = {}
 
+        # --------------------------------------------------------
+        # UOM Conversions
+        # --------------------------------------------------------
+        uom_data = frappe.get_all(
+            "UOM Conversion Detail",
+            fields=["parent", "uom", "conversion_factor"]
+        )
+
+        uom_map = {}
         for u in uom_data:
             uom_map.setdefault(u["parent"], []).append({
                 "uom": u["uom"],
                 "conversion_factor": u["conversion_factor"]
             })
 
+        # --------------------------------------------------------
         # Warehouses
-        bin_data = frappe.get_all("Bin", fields=["item_code", "warehouse", "actual_qty"])
-
-        # Prices
-        price_lists = frappe.get_all(
-            "Item Price",
-            fields=["price_list", "price_list_rate", "item_code", "selling","uom", "buying"]
+        # --------------------------------------------------------
+        bin_data = frappe.get_all(
+            "Bin",
+            fields=["item_code", "warehouse", "actual_qty"]
         )
 
-        # Prep containers
+        # --------------------------------------------------------
+        # Prices
+        # --------------------------------------------------------
+        price_lists = frappe.get_all(
+            "Item Price",
+            fields=[
+                "price_list",
+                "price_list_rate",
+                "item_code",
+                "selling",
+                "uom",
+                "buying"
+            ]
+        )
+
         products = {
-            p["item_code"]: {"warehouses": [], "prices": [], "taxes": []}
+            p["item_code"]: {
+                "warehouses": [],
+                "prices": [],
+                "taxes": []
+            }
             for p in product_details
         }
 
-        # Add warehouse qty
+        # Warehouse qty
         for b in bin_data:
             if b["item_code"] in products:
                 products[b["item_code"]]["warehouses"].append({
@@ -239,7 +350,6 @@ def get_products():
                     "qtyOnHand": b["actual_qty"]
                 })
 
-        # Add missing items with 0 qty
         for item_code, pdata in products.items():
             if not pdata["warehouses"]:
                 pdata["warehouses"].append({
@@ -247,7 +357,7 @@ def get_products():
                     "qtyOnHand": 0
                 })
 
-        # Add prices
+        # Prices
         for p in price_lists:
             if p["item_code"] in products:
                 products[p["item_code"]]["prices"].append({
@@ -257,7 +367,7 @@ def get_products():
                     "type": "selling" if p["selling"] else "buying"
                 })
 
-        # Add taxes
+        # Taxes
         for p in product_details:
             item_code = p["item_code"]
             try:
@@ -270,11 +380,14 @@ def get_products():
                         "minimum_net_rate": tax.minimum_net_rate,
                         "maximum_net_rate": tax.maximum_net_rate
                     })
-            except:
+            except Exception:
                 pass
 
-        # Final response list
+        # --------------------------------------------------------
+        # Final Response
+        # --------------------------------------------------------
         final_products = []
+
         for p in product_details:
             item_code = p["item_code"]
             final_products.append({
@@ -288,12 +401,14 @@ def get_products():
                 "taxes": products[item_code]["taxes"],
                 "simple_code": p["custom_simple_code"],
                 "is_sales_item": p["is_sales_item"],
-                "uom": {"stock_uom": p["stock_uom"],
-                "conversions": uom_map.get(item_code, [])},
+                "uom": {
+                    "stock_uom": p["stock_uom"],
+                    "conversions": uom_map.get(item_code, [])
+                },
             })
 
-        # Pagination meta
         total_pages = (total_count + limit - 1) // limit
+
         pagination = {
             "current_page": page,
             "limit": limit,
@@ -313,6 +428,7 @@ def get_products():
     except Exception as e:
         create_response("417", {"error": str(e)})
         frappe.log_error(str(e), "Error fetching products")
+
 
 
 @frappe.whitelist()
