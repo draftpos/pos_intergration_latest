@@ -288,7 +288,8 @@ def get_products():
                 "is_stock_item",
                 "custom_simple_code",
                 "is_sales_item",
-                "stock_uom"
+                "stock_uom",
+                "custom_food_and_tourism_tax"
             ],
             start=start,
             limit=limit,
@@ -395,6 +396,7 @@ def get_products():
                 "itemname": p["item_name"],
                 "groupname": p["item_group"],
                 "maintainstock": p["is_stock_item"],
+                "food_and_tourism_tax": p["custom_food_and_tourism_tax"],
                 "warehouses": products[item_code]["warehouses"],
                 "default warehouse": get_default_warehouse_for_user(),
                 "prices": products[item_code]["prices"],
