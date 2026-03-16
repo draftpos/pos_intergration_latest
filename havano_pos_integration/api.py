@@ -182,18 +182,14 @@ def get_products():
         user_doc = frappe.get_doc("User", user)
 
         # --------------------------------------------------------
-        # 🔐 USER PERMISSIONS FOR ITEM GROUPS
+        # USER PERMISSIONS FOR ITEM GROUPS
         # --------------------------------------------------------
         allowed_item_groups = None
 
         if user_doc.user_rights_profile:
-            profile = frappe.get_doc(
-                "User Rights Profile",
-                user_doc.user_rights_profile
-            )
+            profile = frappe.get_doc("User Rights Profile", user_doc.user_rights_profile)
 
             if profile.is_item_group_related:
-                # Fetch allowed item groups from User Permission table
                 allowed_item_groups = frappe.get_all(
                     "User Permission",
                     filters={
@@ -202,9 +198,9 @@ def get_products():
                     },
                     fields=["for_value"]
                 )
+
                 allowed_item_groups = [g.for_value for g in allowed_item_groups]
 
-                # If enabled but no groups assigned → return empty
                 if not allowed_item_groups:
                     create_response("200", {
                         "products": [],
@@ -224,50 +220,48 @@ def get_products():
                 filters["item_group"] = ["in", allowed_item_groups]
 
         # --------------------------------------------------------
-        # Optional API item_group filter (intersect safely)
+        # Optional API item_group filter
         # --------------------------------------------------------
         if item_group:
             if isinstance(item_group, list):
                 if allowed_item_groups is not None:
-                    intersection = list(
-                        set(item_group) & set(allowed_item_groups or [])
-                    )
+                    intersection = list(set(item_group) & set(allowed_item_groups or []))
                     if not intersection:
-                        create_response("200", {
-                            "products": [],
-                            "pagination": {
-                                "current_page": page,
-                                "limit": limit,
-                                "total_count": 0,
-                                "total_pages": 0,
-                                "has_next_page": False,
-                                "has_prev_page": False,
-                                "next_page": None,
-                                "prev_page": None
-                            }
-                        })
+                        create_response("200", {"products": [], "pagination": {}})
                         return
                     filters["item_group"] = ["in", intersection]
                 else:
                     filters["item_group"] = ["in", item_group]
             else:
-                if allowed_item_groups is not None:
-                    if item_group not in allowed_item_groups:
-                        create_response("200", {
-                            "products": [],
-                            "pagination": {
-                                "current_page": page,
-                                "limit": limit,
-                                "total_count": 0,
-                                "total_pages": 0,
-                                "has_next_page": False,
-                                "has_prev_page": False,
-                                "next_page": None,
-                                "prev_page": None
-                            }
-                        })
-                        return
+                if allowed_item_groups is not None and item_group not in allowed_item_groups:
+                    create_response("200", {"products": [], "pagination": {}})
+                    return
                 filters["item_group"] = item_group
+
+        # --------------------------------------------------------
+        # Dynamic Item Fields (safe for missing columns)
+        # --------------------------------------------------------
+        item_fields = [
+            "name",
+            "item_name",
+            "item_code",
+            "item_group",
+            "is_stock_item",
+            "custom_simple_code",
+            "is_sales_item",
+            "stock_uom"
+        ]
+
+        has_food_tourism = frappe.db.has_column("Item", "custom_food_and_tourism_tax")
+        has_food_tax = frappe.db.has_column("Item", "custom_food_tax")
+        has_tourism_tax = frappe.db.has_column("Item", "custom_tourism_tax")
+
+        if has_food_tourism:
+            item_fields.append("custom_food_and_tourism_tax")
+        if has_food_tax:
+            item_fields.append("custom_food_tax")
+        if has_tourism_tax:
+            item_fields.append("custom_tourism_tax")
 
         # --------------------------------------------------------
         # Count
@@ -280,19 +274,7 @@ def get_products():
         product_details = frappe.get_all(
             "Item",
             filters=filters,
-            fields=[
-                "name",
-                "item_name",
-                "item_code",
-                "item_group",
-                "is_stock_item",
-                "custom_simple_code",
-                "is_sales_item",
-                "stock_uom",
-                "custom_food_and_tourism_tax",
-                "custom_food_tax",
-                 "custom_tourism_tax"
-            ],
+            fields=item_fields,
             start=start,
             limit=limit,
             order_by="item_code"
@@ -345,7 +327,7 @@ def get_products():
             for p in product_details
         }
 
-        # Warehouse qty
+        # Warehouses
         for b in bin_data:
             if b["item_code"] in products:
                 products[b["item_code"]]["warehouses"].append({
@@ -393,14 +375,12 @@ def get_products():
 
         for p in product_details:
             item_code = p["item_code"]
-            final_products.append({
+
+            product = {
                 "itemcode": item_code,
                 "itemname": p["item_name"],
                 "groupname": p["item_group"],
                 "maintainstock": p["is_stock_item"],
-                "food_and_tourism_tax": p["custom_food_and_tourism_tax"],
-                "food_tax": p["custom_food_tax"],
-                "tourism_tax": p["custom_tourism_tax"],
                 "warehouses": products[item_code]["warehouses"],
                 "default warehouse": get_default_warehouse_for_user(),
                 "prices": products[item_code]["prices"],
@@ -410,8 +390,19 @@ def get_products():
                 "uom": {
                     "stock_uom": p["stock_uom"],
                     "conversions": uom_map.get(item_code, [])
-                },
-            })
+                }
+            }
+
+            if has_food_tourism:
+                product["food_and_tourism_tax"] = p.get("custom_food_and_tourism_tax")
+
+            if has_food_tax:
+                product["food_tax"] = p.get("custom_food_tax")
+
+            if has_tourism_tax:
+                product["tourism_tax"] = p.get("custom_tourism_tax")
+
+            final_products.append(product)
 
         total_pages = (total_count + limit - 1) // limit
 
@@ -434,6 +425,278 @@ def get_products():
     except Exception as e:
         create_response("417", {"error": str(e)})
         frappe.log_error(str(e), "Error fetching products")
+# @frappe.whitelist()
+# def get_products():
+#     try:
+#         data = frappe.local.form_dict
+
+#         # Pagination
+#         page = int(data.get("page", 1))
+#         limit = int(data.get("limit", 1000))
+#         if page < 1:
+#             page = 1
+#         start = (page - 1) * limit
+
+#         item_group = data.get("item_group")
+
+#         filters = {"disabled": 0}
+
+#         user = frappe.session.user
+#         user_doc = frappe.get_doc("User", user)
+
+#         # --------------------------------------------------------
+#         # 🔐 USER PERMISSIONS FOR ITEM GROUPS
+#         # --------------------------------------------------------
+#         allowed_item_groups = None
+
+#         if user_doc.user_rights_profile:
+#             profile = frappe.get_doc(
+#                 "User Rights Profile",
+#                 user_doc.user_rights_profile
+#             )
+
+#             if profile.is_item_group_related:
+#                 # Fetch allowed item groups from User Permission table
+#                 allowed_item_groups = frappe.get_all(
+#                     "User Permission",
+#                     filters={
+#                         "user": user_doc.name,
+#                         "allow": "Item Group"
+#                     },
+#                     fields=["for_value"]
+#                 )
+#                 allowed_item_groups = [g.for_value for g in allowed_item_groups]
+
+#                 # If enabled but no groups assigned → return empty
+#                 if not allowed_item_groups:
+#                     create_response("200", {
+#                         "products": [],
+#                         "pagination": {
+#                             "current_page": page,
+#                             "limit": limit,
+#                             "total_count": 0,
+#                             "total_pages": 0,
+#                             "has_next_page": False,
+#                             "has_prev_page": False,
+#                             "next_page": None,
+#                             "prev_page": None
+#                         }
+#                     })
+#                     return
+
+#                 filters["item_group"] = ["in", allowed_item_groups]
+
+#         # --------------------------------------------------------
+#         # Optional API item_group filter (intersect safely)
+#         # --------------------------------------------------------
+#         if item_group:
+#             if isinstance(item_group, list):
+#                 if allowed_item_groups is not None:
+#                     intersection = list(
+#                         set(item_group) & set(allowed_item_groups or [])
+#                     )
+#                     if not intersection:
+#                         create_response("200", {
+#                             "products": [],
+#                             "pagination": {
+#                                 "current_page": page,
+#                                 "limit": limit,
+#                                 "total_count": 0,
+#                                 "total_pages": 0,
+#                                 "has_next_page": False,
+#                                 "has_prev_page": False,
+#                                 "next_page": None,
+#                                 "prev_page": None
+#                             }
+#                         })
+#                         return
+#                     filters["item_group"] = ["in", intersection]
+#                 else:
+#                     filters["item_group"] = ["in", item_group]
+#             else:
+#                 if allowed_item_groups is not None:
+#                     if item_group not in allowed_item_groups:
+#                         create_response("200", {
+#                             "products": [],
+#                             "pagination": {
+#                                 "current_page": page,
+#                                 "limit": limit,
+#                                 "total_count": 0,
+#                                 "total_pages": 0,
+#                                 "has_next_page": False,
+#                                 "has_prev_page": False,
+#                                 "next_page": None,
+#                                 "prev_page": None
+#                             }
+#                         })
+#                         return
+#                 filters["item_group"] = item_group
+
+#         # --------------------------------------------------------
+#         # Count
+#         # --------------------------------------------------------
+#         total_count = frappe.db.count("Item", filters=filters)
+
+#         # --------------------------------------------------------
+#         # Fetch Items
+#         # --------------------------------------------------------
+#         product_details = frappe.get_all(
+#             "Item",
+#             filters=filters,
+#             fields=[
+#                 "name",
+#                 "item_name",
+#                 "item_code",
+#                 "item_group",
+#                 "is_stock_item",
+#                 "custom_simple_code",
+#                 "is_sales_item",
+#                 "stock_uom",
+#                 "custom_food_and_tourism_tax",
+#                 "custom_food_tax",
+#                  "custom_tourism_tax"
+#             ],
+#             start=start,
+#             limit=limit,
+#             order_by="item_code"
+#         )
+
+#         # --------------------------------------------------------
+#         # UOM Conversions
+#         # --------------------------------------------------------
+#         uom_data = frappe.get_all(
+#             "UOM Conversion Detail",
+#             fields=["parent", "uom", "conversion_factor"]
+#         )
+
+#         uom_map = {}
+#         for u in uom_data:
+#             uom_map.setdefault(u["parent"], []).append({
+#                 "uom": u["uom"],
+#                 "conversion_factor": u["conversion_factor"]
+#             })
+
+#         # --------------------------------------------------------
+#         # Warehouses
+#         # --------------------------------------------------------
+#         bin_data = frappe.get_all(
+#             "Bin",
+#             fields=["item_code", "warehouse", "actual_qty"]
+#         )
+
+#         # --------------------------------------------------------
+#         # Prices
+#         # --------------------------------------------------------
+#         price_lists = frappe.get_all(
+#             "Item Price",
+#             fields=[
+#                 "price_list",
+#                 "price_list_rate",
+#                 "item_code",
+#                 "selling",
+#                 "uom",
+#                 "buying"
+#             ]
+#         )
+
+#         products = {
+#             p["item_code"]: {
+#                 "warehouses": [],
+#                 "prices": [],
+#                 "taxes": []
+#             }
+#             for p in product_details
+#         }
+
+#         # Warehouse qty
+#         for b in bin_data:
+#             if b["item_code"] in products:
+#                 products[b["item_code"]]["warehouses"].append({
+#                     "warehouse": b["warehouse"],
+#                     "qtyOnHand": b["actual_qty"]
+#                 })
+
+#         for item_code, pdata in products.items():
+#             if not pdata["warehouses"]:
+#                 pdata["warehouses"].append({
+#                     "warehouse": get_default_warehouse_for_user(),
+#                     "qtyOnHand": 0
+#                 })
+
+#         # Prices
+#         for p in price_lists:
+#             if p["item_code"] in products:
+#                 products[p["item_code"]]["prices"].append({
+#                     "priceName": p["price_list"],
+#                     "price": p["price_list_rate"],
+#                     "uom": p["uom"] or "nos",
+#                     "type": "selling" if p["selling"] else "buying"
+#                 })
+
+#         # Taxes
+#         for p in product_details:
+#             item_code = p["item_code"]
+#             try:
+#                 doc = frappe.get_doc("Item", item_code)
+#                 for tax in getattr(doc, "taxes", []):
+#                     products[item_code]["taxes"].append({
+#                         "item_tax_template": tax.item_tax_template,
+#                         "tax_category": tax.tax_category,
+#                         "valid_from": tax.valid_from,
+#                         "minimum_net_rate": tax.minimum_net_rate,
+#                         "maximum_net_rate": tax.maximum_net_rate
+#                     })
+#             except Exception:
+#                 pass
+
+#         # --------------------------------------------------------
+#         # Final Response
+#         # --------------------------------------------------------
+#         final_products = []
+
+#         for p in product_details:
+#             item_code = p["item_code"]
+#             final_products.append({
+#                 "itemcode": item_code,
+#                 "itemname": p["item_name"],
+#                 "groupname": p["item_group"],
+#                 "maintainstock": p["is_stock_item"],
+#                 "food_and_tourism_tax": p["custom_food_and_tourism_tax"],
+#                 "food_tax": p["custom_food_tax"],
+#                 "tourism_tax": p["custom_tourism_tax"],
+#                 "warehouses": products[item_code]["warehouses"],
+#                 "default warehouse": get_default_warehouse_for_user(),
+#                 "prices": products[item_code]["prices"],
+#                 "taxes": products[item_code]["taxes"],
+#                 "simple_code": p["custom_simple_code"],
+#                 "is_sales_item": p["is_sales_item"],
+#                 "uom": {
+#                     "stock_uom": p["stock_uom"],
+#                     "conversions": uom_map.get(item_code, [])
+#                 },
+#             })
+
+#         total_pages = (total_count + limit - 1) // limit
+
+#         pagination = {
+#             "current_page": page,
+#             "limit": limit,
+#             "total_count": total_count,
+#             "total_pages": total_pages,
+#             "has_next_page": page < total_pages,
+#             "has_prev_page": page > 1,
+#             "next_page": page + 1 if page < total_pages else None,
+#             "prev_page": page - 1 if page > 1 else None
+#         }
+
+#         create_response("200", {
+#             "products": final_products,
+#             "pagination": pagination
+#         })
+
+#     except Exception as e:
+#         create_response("417", {"error": str(e)})
+#         frappe.log_error(str(e), "Error fetching products")
 
 
 
