@@ -255,6 +255,7 @@ def get_products():
         has_food_tourism = frappe.db.has_column("Item", "custom_food_and_tourism_tax")
         has_food_tax = frappe.db.has_column("Item", "custom_food_tax")
         has_tourism_tax = frappe.db.has_column("Item", "custom_tourism_tax")
+        cummulative = frappe.db.has_column("Item", "custom_cummulative")
 
         if has_food_tourism:
             item_fields.append("custom_food_and_tourism_tax")
@@ -262,6 +263,8 @@ def get_products():
             item_fields.append("custom_food_tax")
         if has_tourism_tax:
             item_fields.append("custom_tourism_tax")
+        if cummulative:
+            item_fields.append("custom_cummulative")
 
         # --------------------------------------------------------
         # Count
@@ -401,6 +404,9 @@ def get_products():
 
             if has_tourism_tax:
                 product["tourism_tax"] = p.get("custom_tourism_tax")
+            if cummulative:
+                product["cummulative"] = p.get("custom_cummulative")
+            
 
             final_products.append(product)
 
