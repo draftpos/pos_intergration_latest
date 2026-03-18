@@ -405,7 +405,7 @@ def get_products():
             if has_tourism_tax:
                 product["tourism_tax"] = p.get("custom_tourism_tax")
             if cummulative:
-                product["cummulative"] = p.get("custom_cummulative")
+                product["cumulative"] = p.get("custom_cummulative")
             
 
             final_products.append(product)
