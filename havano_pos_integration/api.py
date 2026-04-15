@@ -1405,3 +1405,355 @@ def create_customer():
         frappe.log_error(message=str(e), title="Error creating customer and assigning permission")
         return
 
+
+@frappe.whitelist()
+def get_single_product(item_code=None):
+    """Fetch a single product with its warehouses, prices, taxes, and UOM conversions.
+    Used for real-time updates when a WebSocket event indicates an item has changed."""
+    try:
+        if not item_code:
+            data = frappe.local.form_dict
+            item_code = data.get("item_code")
+
+        if not item_code:
+            create_response("417", {"error": "item_code is required"})
+            return
+
+        if not frappe.db.exists("Item", item_code):
+            create_response("404", {"error": f"Item {item_code} not found"})
+            return
+
+        item_fields = [
+            "name", "item_name", "item_code", "item_group",
+            "is_stock_item", "custom_simple_code", "is_sales_item",
+            "stock_uom", "disabled"
+        ]
+
+        has_food_tourism = frappe.db.has_column("Item", "custom_food_and_tourism_tax")
+        has_food_tax = frappe.db.has_column("Item", "custom_food_tax")
+        has_tourism_tax = frappe.db.has_column("Item", "custom_tourism_tax")
+        has_cummulative = frappe.db.has_column("Item", "custom_cummulative")
+
+        if has_food_tourism:
+            item_fields.append("custom_food_and_tourism_tax")
+        if has_food_tax:
+            item_fields.append("custom_food_tax")
+        if has_tourism_tax:
+            item_fields.append("custom_tourism_tax")
+        if has_cummulative:
+            item_fields.append("custom_cummulative")
+
+        item = frappe.db.get_value("Item", item_code, item_fields, as_dict=True)
+        if not item:
+            create_response("404", {"error": f"Item {item_code} not found"})
+            return
+
+        # UOM Conversions
+        conversions = frappe.get_all(
+            "UOM Conversion Detail",
+            filters={"parent": item_code},
+            fields=["uom", "conversion_factor"]
+        )
+
+        # Warehouses (Bin data)
+        bins = frappe.get_all(
+            "Bin",
+            filters={"item_code": item_code},
+            fields=["warehouse", "actual_qty"]
+        )
+        warehouses = [{"warehouse": b["warehouse"], "qtyOnHand": b["actual_qty"]} for b in bins]
+        if not warehouses:
+            warehouses = [{"warehouse": get_default_warehouse_for_user(), "qtyOnHand": 0}]
+
+        # Prices
+        prices_data = frappe.get_all(
+            "Item Price",
+            filters={"item_code": item_code},
+            fields=["price_list", "price_list_rate", "selling", "uom", "buying"]
+        )
+        prices = [{
+            "priceName": p["price_list"],
+            "price": p["price_list_rate"],
+            "uom": p["uom"] or "nos",
+            "type": "selling" if p["selling"] else "buying"
+        } for p in prices_data]
+
+        # Taxes
+        taxes = []
+        try:
+            doc = frappe.get_doc("Item", item_code)
+            for tax in getattr(doc, "taxes", []):
+                taxes.append({
+                    "item_tax_template": tax.item_tax_template,
+                    "tax_category": tax.tax_category,
+                    "valid_from": tax.valid_from,
+                    "minimum_net_rate": tax.minimum_net_rate,
+                    "maximum_net_rate": tax.maximum_net_rate
+                })
+        except Exception:
+            pass
+
+        product = {
+            "itemcode": item["item_code"],
+            "itemname": item["item_name"],
+            "groupname": item["item_group"],
+            "maintainstock": item["is_stock_item"],
+            "warehouses": warehouses,
+            "default warehouse": get_default_warehouse_for_user(),
+            "prices": prices,
+            "taxes": taxes,
+            "simple_code": item.get("custom_simple_code"),
+            "is_sales_item": item["is_sales_item"],
+            "disabled": item.get("disabled", 0),
+            "uom": {
+                "stock_uom": item["stock_uom"],
+                "conversions": conversions
+            }
+        }
+
+        if has_food_tourism:
+            product["food_and_tourism_tax"] = item.get("custom_food_and_tourism_tax")
+        if has_food_tax:
+            product["food_tax"] = item.get("custom_food_tax")
+        if has_tourism_tax:
+            product["tourism_tax"] = item.get("custom_tourism_tax")
+        if has_cummulative:
+            product["cumulative"] = item.get("custom_cummulative")
+
+        create_response("200", {"product": product})
+
+    except Exception as e:
+        create_response("417", {"error": str(e)})
+        frappe.log_error(str(e), "Error fetching single product")
+
+
+@frappe.whitelist()
+def get_modified_products(since=None):
+    """Fetch only products modified since a given timestamp.
+    Used for delta sync instead of reloading all products."""
+    try:
+        data = frappe.local.form_dict
+        if not since:
+            since = data.get("since")
+
+        if not since:
+            create_response("417", {"error": "since timestamp is required"})
+            return
+
+        filters = {"disabled": 0, "modified": [">=", since]}
+
+        user = frappe.session.user
+        user_doc = frappe.get_doc("User", user)
+
+        # User permission filtering for item groups
+        if user_doc.user_rights_profile:
+            profile = frappe.get_doc("User Rights Profile", user_doc.user_rights_profile)
+            if profile.is_item_group_related:
+                allowed_item_groups = frappe.get_all(
+                    "User Permission",
+                    filters={"user": user_doc.name, "allow": "Item Group"},
+                    fields=["for_value"]
+                )
+                allowed_item_groups = [g.for_value for g in allowed_item_groups]
+                if allowed_item_groups:
+                    filters["item_group"] = ["in", allowed_item_groups]
+
+        modified_items = frappe.get_all(
+            "Item",
+            filters=filters,
+            fields=["item_code"],
+            order_by="modified desc"
+        )
+
+        # Also get items with modified prices since timestamp
+        modified_prices = frappe.get_all(
+            "Item Price",
+            filters={"modified": [">=", since]},
+            fields=["item_code"],
+            group_by="item_code"
+        )
+
+        # Also get items with stock changes since timestamp
+        modified_stock = frappe.db.sql("""
+            SELECT DISTINCT item_code
+            FROM `tabStock Ledger Entry`
+            WHERE modified >= %s
+        """, since, as_dict=True)
+
+        # Combine all modified item codes
+        all_item_codes = set()
+        for item in modified_items:
+            all_item_codes.add(item["item_code"])
+        for item in modified_prices:
+            all_item_codes.add(item["item_code"])
+        for item in modified_stock:
+            all_item_codes.add(item["item_code"])
+
+        # Also check for deleted items since timestamp
+        deleted_items = frappe.get_all(
+            "Deleted Document",
+            filters={
+                "deleted_doctype": "Item",
+                "modified": [">=", since]
+            },
+            fields=["deleted_name"]
+        )
+        deleted_item_codes = [d["deleted_name"] for d in deleted_items]
+
+        # Fetch full product data for each modified item
+        products = []
+        for item_code in all_item_codes:
+            try:
+                if not frappe.db.exists("Item", item_code):
+                    continue
+
+                item_fields = [
+                    "name", "item_name", "item_code", "item_group",
+                    "is_stock_item", "custom_simple_code", "is_sales_item",
+                    "stock_uom", "disabled"
+                ]
+
+                has_food_tourism = frappe.db.has_column("Item", "custom_food_and_tourism_tax")
+                has_food_tax = frappe.db.has_column("Item", "custom_food_tax")
+                has_tourism_tax = frappe.db.has_column("Item", "custom_tourism_tax")
+                has_cummulative = frappe.db.has_column("Item", "custom_cummulative")
+
+                if has_food_tourism:
+                    item_fields.append("custom_food_and_tourism_tax")
+                if has_food_tax:
+                    item_fields.append("custom_food_tax")
+                if has_tourism_tax:
+                    item_fields.append("custom_tourism_tax")
+                if has_cummulative:
+                    item_fields.append("custom_cummulative")
+
+                item = frappe.db.get_value("Item", item_code, item_fields, as_dict=True)
+                if not item:
+                    continue
+
+                # Bins
+                bins = frappe.get_all(
+                    "Bin", filters={"item_code": item_code},
+                    fields=["warehouse", "actual_qty"]
+                )
+                warehouses = [{"warehouse": b["warehouse"], "qtyOnHand": b["actual_qty"]} for b in bins]
+                if not warehouses:
+                    warehouses = [{"warehouse": get_default_warehouse_for_user(), "qtyOnHand": 0}]
+
+                # Prices
+                prices_data = frappe.get_all(
+                    "Item Price", filters={"item_code": item_code},
+                    fields=["price_list", "price_list_rate", "selling", "uom", "buying"]
+                )
+                prices = [{
+                    "priceName": p["price_list"],
+                    "price": p["price_list_rate"],
+                    "uom": p["uom"] or "nos",
+                    "type": "selling" if p["selling"] else "buying"
+                } for p in prices_data]
+
+                # UOM
+                conversions = frappe.get_all(
+                    "UOM Conversion Detail",
+                    filters={"parent": item_code},
+                    fields=["uom", "conversion_factor"]
+                )
+
+                # Taxes
+                taxes = []
+                try:
+                    doc = frappe.get_doc("Item", item_code)
+                    for tax in getattr(doc, "taxes", []):
+                        taxes.append({
+                            "item_tax_template": tax.item_tax_template,
+                            "tax_category": tax.tax_category,
+                            "valid_from": tax.valid_from,
+                            "minimum_net_rate": tax.minimum_net_rate,
+                            "maximum_net_rate": tax.maximum_net_rate
+                        })
+                except Exception:
+                    pass
+
+                product = {
+                    "itemcode": item["item_code"],
+                    "itemname": item["item_name"],
+                    "groupname": item["item_group"],
+                    "maintainstock": item["is_stock_item"],
+                    "warehouses": warehouses,
+                    "default warehouse": get_default_warehouse_for_user(),
+                    "prices": prices,
+                    "taxes": taxes,
+                    "simple_code": item.get("custom_simple_code"),
+                    "is_sales_item": item["is_sales_item"],
+                    "disabled": item.get("disabled", 0),
+                    "uom": {
+                        "stock_uom": item["stock_uom"],
+                        "conversions": conversions
+                    }
+                }
+
+                if has_food_tourism:
+                    product["food_and_tourism_tax"] = item.get("custom_food_and_tourism_tax")
+                if has_food_tax:
+                    product["food_tax"] = item.get("custom_food_tax")
+                if has_tourism_tax:
+                    product["tourism_tax"] = item.get("custom_tourism_tax")
+                if has_cummulative:
+                    product["cumulative"] = item.get("custom_cummulative")
+
+                products.append(product)
+
+            except Exception:
+                continue
+
+        create_response("200", {
+            "products": products,
+            "deleted_items": deleted_item_codes,
+            "total_modified": len(products),
+            "total_deleted": len(deleted_item_codes),
+            "since": since,
+            "server_time": str(now_datetime())
+        })
+
+    except Exception as e:
+        create_response("417", {"error": str(e)})
+        frappe.log_error(str(e), "Error fetching modified products")
+
+
+@frappe.whitelist()
+def get_stock_update(item_code=None, warehouse=None):
+    """Get current stock for a specific item and/or warehouse.
+    Used for real-time stock updates from WebSocket events."""
+    try:
+        data = frappe.local.form_dict
+        if not item_code:
+            item_code = data.get("item_code")
+        if not warehouse:
+            warehouse = data.get("warehouse")
+
+        filters = {}
+        if item_code:
+            filters["item_code"] = item_code
+        if warehouse:
+            filters["warehouse"] = warehouse
+
+        if not filters:
+            create_response("417", {"error": "item_code or warehouse is required"})
+            return
+
+        bins = frappe.get_all(
+            "Bin",
+            filters=filters,
+            fields=["item_code", "warehouse", "actual_qty", "reserved_qty",
+                     "ordered_qty", "stock_value", "valuation_rate"]
+        )
+
+        create_response("200", {
+            "stock": bins,
+            "server_time": str(now_datetime())
+        })
+
+    except Exception as e:
+        create_response("417", {"error": str(e)})
+        frappe.log_error(str(e), "Error fetching stock update")
+
