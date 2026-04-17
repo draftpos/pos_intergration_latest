@@ -256,6 +256,12 @@ def get_products():
         has_food_tax = frappe.db.has_column("Item", "custom_food_tax")
         has_tourism_tax = frappe.db.has_column("Item", "custom_tourism_tax")
         cummulative = frappe.db.has_column("Item", "custom_cummulative")
+        has_order_item_1 = frappe.db.has_column("Item", "custom_is_order_item_1")
+        has_order_item_2 = frappe.db.has_column("Item", "custom_is_order_item_2")
+        has_order_item_3 = frappe.db.has_column("Item", "custom_is_order_item_3")
+        has_order_item_4 = frappe.db.has_column("Item", "custom_is_order_item_4")
+        has_order_item_5 = frappe.db.has_column("Item", "custom_is_order_item_5")
+        has_order_item_6 = frappe.db.has_column("Item", "custom_is_order_item_6")
 
         if has_food_tourism:
             item_fields.append("custom_food_and_tourism_tax")
@@ -265,6 +271,18 @@ def get_products():
             item_fields.append("custom_tourism_tax")
         if cummulative:
             item_fields.append("custom_cummulative")
+        if has_order_item_1:
+            item_fields.append("custom_is_order_item_1")
+        if has_order_item_2:
+            item_fields.append("custom_is_order_item_2")
+        if has_order_item_3:
+            item_fields.append("custom_is_order_item_3")
+        if has_order_item_4:
+            item_fields.append("custom_is_order_item_4")
+        if has_order_item_5:
+            item_fields.append("custom_is_order_item_5")
+        if has_order_item_6:
+            item_fields.append("custom_is_order_item_6")
 
         # --------------------------------------------------------
         # Count
@@ -390,6 +408,7 @@ def get_products():
                 "taxes": products[item_code]["taxes"],
                 "simple_code": p["custom_simple_code"],
                 "is_sales_item": p["is_sales_item"],
+                "test":"nothing",
                 "uom": {
                     "stock_uom": p["stock_uom"],
                     "conversions": uom_map.get(item_code, [])
@@ -406,6 +425,18 @@ def get_products():
                 product["tourism_tax"] = p.get("custom_tourism_tax")
             if cummulative:
                 product["cumulative"] = p.get("custom_cummulative")
+            if has_order_item_1:
+                product["custom_is_order_item_1"] = p.get("custom_is_order_item_1")
+            if has_order_item_2:
+                product["custom_is_order_item_2"] = p.get("custom_is_order_item_2")
+            if has_order_item_3:
+                product["custom_is_order_item_3"] = p.get("custom_is_order_item_3")
+            if has_order_item_4:
+                product["custom_is_order_item_4"] = p.get("custom_is_order_item_4")
+            if has_order_item_5:
+                product["custom_is_order_item_5"] = p.get("custom_is_order_item_5")
+            if has_order_item_6:
+                product["custom_is_order_item_6"] = p.get("custom_is_order_item_6")
             
 
             final_products.append(product)
