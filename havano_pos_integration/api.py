@@ -1,7 +1,7 @@
 import frappe
 from frappe import _
 from havano_pos_integration.utils import create_response
-from frappe.utils import now_datetime
+from frappe.utils import now_datetime, today, flt
 
 @frappe.whitelist()
 def test_api(name):
@@ -262,6 +262,7 @@ def get_products():
         has_order_item_4 = frappe.db.has_column("Item", "custom_is_order_item_4")
         has_order_item_5 = frappe.db.has_column("Item", "custom_is_order_item_5")
         has_order_item_6 = frappe.db.has_column("Item", "custom_is_order_item_6")
+        has_is_pharmacy_product = frappe.db.has_column("Item", "custom_is_pharmacy_product")
 
         if has_food_tourism:
             item_fields.append("custom_food_and_tourism_tax")
@@ -283,6 +284,8 @@ def get_products():
             item_fields.append("custom_is_order_item_5")
         if has_order_item_6:
             item_fields.append("custom_is_order_item_6")
+        if has_is_pharmacy_product:
+            item_fields.append("custom_is_pharmacy_product")
 
         # --------------------------------------------------------
         # Count
@@ -338,6 +341,41 @@ def get_products():
                 "buying"
             ]
         )
+
+        # --------------------------------------------------------
+        # Batches (pharmacy / expiry tracking) - guarded
+        # Never let batch fetch break the products endpoint.
+        # --------------------------------------------------------
+        batches_by_item = {}
+        try:
+            if frappe.db.table_exists("Batch"):
+                item_codes = [p["item_code"] for p in product_details]
+                if item_codes:
+                    batch_filters = {
+                        "item": ["in", item_codes],
+                        "disabled": 0,
+                    }
+                    batch_fields = ["name", "batch_id", "item", "expiry_date"]
+                    if frappe.db.has_column("Batch", "batch_qty"):
+                        batch_fields.append("batch_qty")
+                    batch_rows = frappe.db.get_all(
+                        "Batch",
+                        filters=batch_filters,
+                        or_filters=[
+                            ["expiry_date", "is", "not set"],
+                            ["expiry_date", ">=", today()],
+                        ],
+                        fields=batch_fields,
+                        limit_page_length=0,
+                    )
+                    for b in batch_rows:
+                        batches_by_item.setdefault(b["item"], []).append({
+                            "batch_no": b.get("batch_id") or b.get("name"),
+                            "expiry_date": b.get("expiry_date"),
+                            "qty": flt(b.get("batch_qty") or 0),
+                        })
+        except Exception:
+            batches_by_item = {}
 
         products = {
             p["item_code"]: {
@@ -437,7 +475,13 @@ def get_products():
                 product["custom_is_order_item_5"] = p.get("custom_is_order_item_5")
             if has_order_item_6:
                 product["custom_is_order_item_6"] = p.get("custom_is_order_item_6")
-            
+
+            if has_is_pharmacy_product:
+                product["is_pharmacy_product"] = bool(p.get("custom_is_pharmacy_product") or 0)
+            else:
+                product["is_pharmacy_product"] = False
+
+            product["batches"] = batches_by_item.get(item_code, [])
 
             final_products.append(product)
 
