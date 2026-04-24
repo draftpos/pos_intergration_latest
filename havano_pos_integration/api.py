@@ -249,7 +249,12 @@ def get_products():
             "is_stock_item",
             "custom_simple_code",
             "is_sales_item",
-            "stock_uom"
+            "stock_uom",
+            # Variant fields — standard on the Item doctype.
+            # `has_variants` is 1 on template items; `variant_of` holds the
+            # parent template's item_code on variant children.
+            "has_variants",
+            "variant_of",
         ]
 
         has_food_tourism = frappe.db.has_column("Item", "custom_food_and_tourism_tax")
@@ -377,6 +382,31 @@ def get_products():
         except Exception:
             batches_by_item = {}
 
+        # --------------------------------------------------------
+        # Item Variant Attributes (bulk fetch for this page)
+        # --------------------------------------------------------
+        # `Item Variant Attribute` is the child table holding per-item
+        # attribute values. We pull every row for the current page in one
+        # go and group by `parent` (the item_code) — far cheaper than one
+        # `frappe.get_doc` per item.
+        attributes_by_item = {}
+        try:
+            page_codes = [p["item_code"] for p in product_details]
+            if page_codes:
+                attr_rows = frappe.get_all(
+                    "Item Variant Attribute",
+                    filters={"parent": ["in", page_codes]},
+                    fields=["parent", "attribute", "attribute_value"],
+                )
+                for a in attr_rows:
+                    attributes_by_item.setdefault(a["parent"], []).append({
+                        "attribute":       a.get("attribute"),
+                        "attribute_value": a.get("attribute_value"),
+                    })
+        except Exception:
+            # Don't break get_products if the child table layout changes.
+            attributes_by_item = {}
+
         products = {
             p["item_code"]: {
                 "warehouses": [],
@@ -450,7 +480,17 @@ def get_products():
                 "uom": {
                     "stock_uom": p["stock_uom"],
                     "conversions": uom_map.get(item_code, [])
-                }
+                },
+                # Variant metadata (new in v2026.04):
+                #   has_variants → 1 on template items (no price rows of
+                #                  their own; variants carry them).
+                #   variant_of   → parent template's item_code for variants.
+                #   attributes   → list of {attribute, attribute_value} rows
+                #                  from the Item Variant Attribute child
+                #                  table. POS uses this to build the picker.
+                "has_variants": bool(p.get("has_variants") or 0),
+                "variant_of":   p.get("variant_of") or None,
+                "attributes":   attributes_by_item.get(item_code, []),
             }
 
             if has_food_tourism:
