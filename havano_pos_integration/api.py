@@ -411,7 +411,8 @@ def get_products():
             p["item_code"]: {
                 "warehouses": [],
                 "prices": [],
-                "taxes": []
+                "taxes": [],
+                "barcodes":[]
             }
             for p in product_details
         }
@@ -456,7 +457,20 @@ def get_products():
                     })
             except Exception:
                 pass
-
+        
+        # Barcode
+        for p in product_details:
+            item_code = p["item_code"]
+            try:
+                doc = frappe.get_doc("Item", item_code)
+                for barcode in getattr(doc, "barcodes", []):
+                    products[item_code]["barcodes"].append({
+                        "barcode": barcode.barcode,
+                        "barcode_type": barcode.barcode_type,
+                        "uom": barcode.uom
+                    })
+            except Exception:
+                pass
         # --------------------------------------------------------
         # Final Response
         # --------------------------------------------------------
@@ -473,6 +487,7 @@ def get_products():
                 "warehouses": products[item_code]["warehouses"],
                 "default warehouse": get_default_warehouse_for_user(),
                 "prices": products[item_code]["prices"],
+                "barcodes": products[item_code]["barcodes"] if "barcodes" in products[item_code] else [],
                 "taxes": products[item_code]["taxes"],
                 "simple_code": p["custom_simple_code"],
                 "is_sales_item": p["is_sales_item"],
@@ -546,6 +561,7 @@ def get_products():
     except Exception as e:
         create_response("417", {"error": str(e)})
         frappe.log_error(str(e), "Error fetching products")
+
 # @frappe.whitelist()
 # def get_products():
 #     try:
